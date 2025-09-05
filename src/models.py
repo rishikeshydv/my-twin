@@ -2,7 +2,7 @@ import psycopg2
 
 conn = psycopg2.connect(
     dbname="rishi-twin",
-    user="postgres",
+    user="rishikeshyadav",
     password="2175",
     host="localhost",
     port="5432"
@@ -15,7 +15,7 @@ def createTable(tableName:str)->None:
             id SERIAL PRIMARY KEY,
             contenttype TEXT,
             contentinfo TEXT,
-            contentembedding VECTOR(768)
+            contentembedding VECTOR(384)
         );
         '''
     cursor.execute(create_table_query)

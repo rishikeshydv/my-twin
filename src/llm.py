@@ -1,22 +1,5 @@
 import requests
-
-def LLMResponse(inputText:str)->str:
-    url = "http://localhost:11434/api/chat"
-    payload = {
-        "model":"llama3.2",
-        "messages":[{"role":"user","content":inputText}],
-        "stream":False
-    }
-    try:
-        res = requests.post(url, json=payload)
-        res.raise_for_status()
-
-        data = res.json()
-        content = data["message"]["content"]
-        return content
-    except requests.exceptions.RequestException as e:
-        print("Error communicating with Ollama:", e)
-        
+       
 def promptEngineering(inputText:str)->str:
     prompt = f"""
         User Input: {inputText}
@@ -39,3 +22,36 @@ def promptEngineering(inputText:str)->str:
     Do not include extra keys, categories, or nested objects. Return exactly one flat JSON object.
     """
     return prompt
+
+def LLMResponse(inputText:str)->str:
+    url = "http://localhost:11434/api/chat"
+    payload = {
+        "model":"llama3.2",
+        "messages":[{"role":"user","content":inputText}],
+        "stream":False
+    }
+    try:
+        res = requests.post(url, json=payload)
+        res.raise_for_status()
+
+        data = res.json()
+        content = data["message"]["content"]
+        return content
+    except requests.exceptions.RequestException as e:
+        print("Error communicating with Ollama:", e)
+ 
+def createEmbeddings(input: str) -> list[float]:
+    try:
+        res = requests.post(
+            "http://localhost:11434/api/embeddings",
+            json={
+                "model": "all-minilm",
+                "prompt": input
+            }
+        )
+        res.raise_for_status()
+        data = res.json()
+        return data["embedding"]
+    
+    except requests.exceptions.RequestException as e:
+        print("Error communicating with Ollama:", e)
