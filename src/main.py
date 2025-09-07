@@ -6,6 +6,7 @@ from src.llm import LLMResponse, promptEngineering, createEmbeddings
 from src.file_handle import PDFHandler
 from src.voice import record_and_detect, save_wav, transcribe
 from src.mcp import WebSearchMCP, DeepSearchMCP
+from src.models import getStartupContext
 from fastapi import FastAPI
 from pydantic import BaseModel
 from watchdog.observers import Observer
@@ -19,17 +20,19 @@ def run_transcription():
             transcript = transcribe(wav_path)
             print("\n📝 Transcript:", transcript.text)
             print("Getting LLM response")
-            llm_response = LLMResponse(promptEngineering(transcript.text))
+            llm_response = LLMResponse(promptEngineering(transcript.text))  #gets json of plan
             print("💬 LLM Response:", llm_response)
             query_map = json.loads(llm_response)
             if query_map["category"] == "startup":
+                #get startup info context
+                startupContext = getStartupContext()
                 if query_map["web_search"] == "True":
                     print("🌐 Performing Deep + Web Search")
-                    res = WebSearchMCP(query_map["improved_query"])
+                    res = WebSearchMCP(query_map["improved_query"],startupContext)
                     print("Web Search MCP Result:", res)
                 else:
                     print("Performing Deep Search Only")
-                    res = DeepSearchMCP(query_map["improved_query"])
+                    res = DeepSearchMCP(query_map["improved_query"],startupContext)
                     print("Deep Search MCP Result:", res)
                     
                 

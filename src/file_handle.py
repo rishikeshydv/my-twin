@@ -45,5 +45,5 @@ class PDFHandler(FileSystemEventHandler):
             print(f"New PDF detected: {event.src_path}")
             #get file name
             file_name = event.src_path.split("/")[-1].split(".")[0]
-            extractPDF(event.src_path, "startup",file_name.lower())
+            extractPDF(event.src_path, "startupinfo",file_name.lower())
         

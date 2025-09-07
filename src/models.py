@@ -40,6 +40,17 @@ def storeInfo(tableName:str, contenttype:str, contentinfo:str, contentembedding:
     conn.commit()
     print(f"Data inserted into '{tableName}' successfully.")
     
+def getStartupContext()->str:
+    search_query = f'''
+        SELECT contentinfo
+        FROM startupintro
+        '''
+    cursor.execute(search_query)
+    results = cursor.fetchall()
+    #return as a complete string
+    return " ".join([r[0] for r in results])
+    
+
 def getContext(queryEmbedding: list[float], tableName: str, top_k: int = 3) -> list[str]:
     # Convert embedding list to Postgres vector string
     vector_str = "[" + ",".join(map(str, queryEmbedding)) + "]"

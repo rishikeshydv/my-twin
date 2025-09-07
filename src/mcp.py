@@ -11,7 +11,7 @@ AZURE_CLIENT_ENDPOINT = os.getenv("AZURE_CLIENT_ENDPOINT")
 AZURE_AGENT_ID = os.getenv("AZURE_AGENT_ID")
 
 # web search for mcp
-def WebSearchMCP(query: str)-> str:
+def WebSearchMCP(query: str, context:str)-> str:
     # Initialize the AI Project client
     project = AIProjectClient(
         endpoint=AZURE_CLIENT_ENDPOINT,
@@ -29,7 +29,12 @@ def WebSearchMCP(query: str)-> str:
     # Prompt engineering for Bing-based search agent
     prompt = f"""
     You are a Web Research Agent that specializes in finding recent, credible, and relevant information to support a startup's strategy and decision-making. 
-    Your focus is on queries related to the startup's industry, market trends, competitors, customer behavior, regulations, and emerging technologies.  
+    Your focus is on queries related to the startup's industry, market trends, competitors, customer behavior, regulations, and emerging technologies.
+    
+    ### Context:
+    The following context is relevant from our internal knowledge base:
+    {context}
+      
     Guidelines:
         1. Always perform a Bing Web Search before responding.
         2. Prioritize information from credible sources:
@@ -114,9 +119,13 @@ def SynthesizeOverview(main_query: str, subquery_responses: list[str]) -> str:
     return resp
 
 #deep search for mcp
-def DeepSearchMCP(query: str):
+def DeepSearchMCP(query: str, context:str):
     prompt = f"""
             You are a research assistant that breaks down complex queries into smaller, targeted sub-queries for web search.
+            
+            ### Context:
+            The following context is relevant from our internal knowledge base:
+            {context}
 
             ### Instructions:
             - Output must be a **valid JSON list of exactly 3 strings**.
@@ -143,8 +152,13 @@ def DeepSearchMCP(query: str):
     for sq in sub_queries:
         search_prompt = f"""
             You are an AI research assistant tasked with performing a deep exploration of the following research query:
-
             Query: "{sq}"
+            
+                        
+            ### Context:
+            The following context is relevant from our internal knowledge base:
+            {context}
+
 
             ### Instructions:
             1. Provide a **detailed, structured answer** to the query.
