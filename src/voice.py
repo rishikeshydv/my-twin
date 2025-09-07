@@ -4,13 +4,18 @@ import numpy as np
 import webrtcvad
 import wave
 import tempfile
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 SAMPLE_RATE = 16000     # ElevenLabs expects 16 kHz PCM
 CHANNELS = 1
 DTYPE = "int16"
 
 client = ElevenLabs(
-    api_key="sk_aa1627e30b90a2510a4ed5cb888a53177bf43336f1f55aef"
+    api_key=ELEVENLABS_API_KEY
 )
 
 vad = webrtcvad.Vad(2)  # Aggressiveness mode (0-3)

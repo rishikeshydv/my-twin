@@ -1,17 +1,16 @@
-# from dotenv import load_dotenv
 import os
 
-# load_dotenv()
-# API_KEY = os.getenv("API_KEY")
 from contextlib import asynccontextmanager
 import threading
 from src.llm import LLMResponse, promptEngineering, createEmbeddings
-from src.file_handle import extractPDF, PDFHandler
+from src.file_handle import PDFHandler
 from src.voice import record_and_detect, save_wav, transcribe
+from src.mcp import WebSearchMCP, DeepSearchMCP
 from fastapi import FastAPI
 from pydantic import BaseModel
 from watchdog.observers import Observer
 import time
+import json
 
 def run_transcription():
     try:
@@ -22,7 +21,18 @@ def run_transcription():
             print("Getting LLM response")
             llm_response = LLMResponse(promptEngineering(transcript.text))
             print("💬 LLM Response:", llm_response)
-        
+            query_map = json.loads(llm_response)
+            if query_map["category"] == "startup":
+                if query_map["web_search"] == "True":
+                    print("🌐 Performing Deep + Web Search")
+                    res = WebSearchMCP(query_map["improved_query"])
+                    print("Web Search MCP Result:", res)
+                else:
+                    print("Performing Deep Search Only")
+                    res = DeepSearchMCP(query_map["improved_query"])
+                    print("Deep Search MCP Result:", res)
+                    
+                
     except KeyboardInterrupt:
         print("\n🛑 Trancription Stopped")
     

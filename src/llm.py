@@ -2,22 +2,16 @@ import requests
        
 def promptEngineering(inputText:str)->str:
     prompt = f"""
-        User Input: {inputText}
+    User Input: {inputText}
     You are a Planner Agent.
 
-    Analyze the user's input and return exactly one JSON object with the following six keys only:
+    Analyze the user's input and return exactly one JSON object with the following three keys only:
 
     "category" → either "startup" or "code"
 
-    "sub_category" → if "startup" then "sales & marketing" or "research"; if "code" then "optimize" or "add"
-
     "improved_query" → rewrite the input in clear, professional English
 
-    "mcp_server" → "mentor" if related to guidance/strategy/startup; "code" if related to programming/technical tasks
-
-    "vector_database" → "startup" if about startups/sales/marketting/research; "code" if about programming/technical tasks
-
-    "web_search" → true if external info is required; otherwise false
+    "web_search" → "True" if external info is required; otherwise "False"
 
     Do not include extra keys, categories, or nested objects. Return exactly one flat JSON object.
     """

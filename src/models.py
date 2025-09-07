@@ -1,11 +1,20 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 conn = psycopg2.connect(
-    dbname="rishi-twin",
-    user="rishikeshyadav",
-    password="2175",
-    host="localhost",
-    port="5432"
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
+    port=DB_PORT
 )
 cursor = conn.cursor()
 
@@ -30,3 +39,22 @@ def storeInfo(tableName:str, contenttype:str, contentinfo:str, contentembedding:
     cursor.execute(insert_query, (contenttype, contentinfo, contentembedding))
     conn.commit()
     print(f"Data inserted into '{tableName}' successfully.")
+    
+def getContext(queryEmbedding: list[float], tableName: str, top_k: int = 3) -> list[str]:
+    # Convert embedding list to Postgres vector string
+    vector_str = "[" + ",".join(map(str, queryEmbedding)) + "]"
+
+    # Build SQL query safely for table name
+    search_query = f'''
+        SELECT contentinfo
+        FROM {tableName}
+        ORDER BY contentembedding <-> %s
+        LIMIT %s;
+    '''
+    cursor.execute(search_query, (vector_str, top_k))
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return [r[0] for r in results]
+
